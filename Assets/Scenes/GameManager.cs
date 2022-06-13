@@ -4,10 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
     public string curUser;
+    public string curHighUser = null;
+    public int curHighScore;
     public TextMeshProUGUI inputName;
 
     public static GameManager Instance;
@@ -20,6 +23,19 @@ public class GameManager : MonoBehaviour
             Instance = this;
 
         DontDestroyOnLoad(this.gameObject);
+
+        LoadScoreData();
+
+        if (curHighUser == null)
+            curHighUser = curUser;
+
+    }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public int highScore;
+        public string highScorePlayer;
     }
 
     public void OnStartButtonClick()
@@ -30,5 +46,29 @@ public class GameManager : MonoBehaviour
     public void OnNameEnter()
     {
         curUser = inputName.text;
+    }
+
+    public void SaveScoreData(int newHighScore)
+    {
+        SaveData data = new SaveData();
+        data.highScorePlayer = curUser;
+        data.highScore = newHighScore;
+
+        string json = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadScoreData()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            curHighUser = data.highScorePlayer;
+            curHighScore = data.highScore;
+        }
     }
 }
