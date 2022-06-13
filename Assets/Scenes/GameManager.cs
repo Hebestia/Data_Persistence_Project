@@ -48,6 +48,11 @@ public class GameManager : MonoBehaviour
         curUser = inputName.text;
     }
 
+    public void OnQuitButtonClick()
+    {
+        SceneManager.LoadScene(2);
+    }
+
     public void SaveScoreData(int newHighScore)
     {
         SaveData data = new SaveData();
